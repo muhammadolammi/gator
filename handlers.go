@@ -91,11 +91,11 @@ func handlerAgg(s *state, cmd command) error {
 	return nil
 }
 
-func handlerAddFeed(s *state, cmd command) error {
+func handlerAddFeed(s *state, cmd command, user database.User) error {
 	if len(cmd.args) != 2 {
 		return errors.New("addfeed command expect a feed name and feed url as the args")
 	}
-	cUser, err := s.db.GetUserWithName(ctx, s.cfg.CurrentUserName)
+	user, err := s.db.GetUserWithName(ctx, s.cfg.CurrentUserName)
 	if err != nil {
 		return err
 	}
@@ -104,7 +104,7 @@ func handlerAddFeed(s *state, cmd command) error {
 		UpdatedAt: time.Now(),
 		Name:      cmd.args[0],
 		Url:       cmd.args[1],
-		UserID:    cUser.ID,
+		UserID:    user.ID,
 	})
 	if err != nil {
 		return err
@@ -124,7 +124,7 @@ func handlerAddFeed(s *state, cmd command) error {
 	return nil
 }
 
-func handlerGetFeeds(s *state, cmd command) error {
+func handlerGetFeeds(s *state, cmd command, user database.User) error {
 	feeds, err := s.db.GetFeeds(ctx)
 	if err != nil {
 		return err
@@ -143,14 +143,14 @@ func handlerGetFeeds(s *state, cmd command) error {
 
 }
 
-func handlerFollow(s *state, cmd command) error {
+func handlerFollow(s *state, cmd command, user database.User) error {
 	if len(cmd.args) != 1 {
 		return errors.New("follow command expect a feed url as the args")
 	}
-	user, err := s.db.GetUserWithName(ctx, s.cfg.CurrentUserName)
-	if err != nil {
-		return err
-	}
+	// user, err := s.db.GetUserWithName(ctx, s.cfg.CurrentUserName)
+	// if err != nil {
+	// 	return err
+	// }
 	feed, err := s.db.GetFeedWithUrl(ctx, cmd.args[0])
 	if err != nil {
 		return err
@@ -169,11 +169,8 @@ func handlerFollow(s *state, cmd command) error {
 	return nil
 }
 
-func handlerFollowing(s *state, cmd command) error {
-	user, err := s.db.GetUserWithName(ctx, s.cfg.CurrentUserName)
-	if err != nil {
-		return err
-	}
+func handlerFollowing(s *state, cmd command, user database.User) error {
+
 	user_followings, err := s.db.GetFeedFollowsForUser(ctx, user.ID)
 	if err != nil {
 		return err
@@ -182,4 +179,16 @@ func handlerFollowing(s *state, cmd command) error {
 		fmt.Println(user_following.FeedName)
 	}
 	return nil
+}
+
+func handlerUnFollow(s *state, cmd command, user database.User) error {
+	if len(cmd.args) != 1 {
+		return errors.New("unfollow command expect a feed_url as the args")
+	}
+	err := s.db.DeleteFeedFollow(ctx, database.DeleteFeedFollowParams{
+		Username: user.Name,
+		FeedUrl:  cmd.args[0],
+	})
+
+	return err
 }
