@@ -109,6 +109,16 @@ func handlerAddFeed(s *state, cmd command) error {
 	if err != nil {
 		return err
 	}
+	// follow the feed for the user automatically
+	_, err = s.db.CreateFeedFollow(ctx, database.CreateFeedFollowParams{
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    feed.UserID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		return err
+	}
 	fmt.Println(feed)
 
 	return nil
@@ -131,4 +141,45 @@ func handlerGetFeeds(s *state, cmd command) error {
 	}
 	return nil
 
+}
+
+func handlerFollow(s *state, cmd command) error {
+	if len(cmd.args) != 1 {
+		return errors.New("follow command expect a feed url as the args")
+	}
+	user, err := s.db.GetUserWithName(ctx, s.cfg.CurrentUserName)
+	if err != nil {
+		return err
+	}
+	feed, err := s.db.GetFeedWithUrl(ctx, cmd.args[0])
+	if err != nil {
+		return err
+	}
+	feed_follow, err := s.db.CreateFeedFollow(ctx, database.CreateFeedFollowParams{
+		CreatedAt: time.Now(),
+		UpdatedAt: time.Now(),
+		UserID:    user.ID,
+		FeedID:    feed.ID,
+	})
+	if err != nil {
+		return err
+	}
+	fmt.Println(feed_follow.FeedName)
+	fmt.Println(feed_follow.UserName)
+	return nil
+}
+
+func handlerFollowing(s *state, cmd command) error {
+	user, err := s.db.GetUserWithName(ctx, s.cfg.CurrentUserName)
+	if err != nil {
+		return err
+	}
+	user_followings, err := s.db.GetFeedFollowsForUser(ctx, user.ID)
+	if err != nil {
+		return err
+	}
+	for _, user_following := range user_followings {
+		fmt.Println(user_following.FeedName)
+	}
+	return nil
 }
