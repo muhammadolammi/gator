@@ -228,3 +228,35 @@ func handlerBrowse(s *state, cmd command, user database.User) error {
 
 	return nil
 }
+
+func handlerHelp(s *state, cmd command) error {
+	fmt.Print(`These are all available functions
+	1. gator users
+		This will list all users indicating the logged in user.
+	2. gator register <user>
+		This will register and auto login a  new user
+	3. gator login <user>
+		This will login to the provided user
+	4. gator agg <time_between_reqs >
+		run the aggregator that fetch feed every time_between_reqs 
+	5. gator reset 
+	This will reset and delete all data on the aggregator
+	6. gator feeds
+		This list all available feeds on the aggregator
+	7. gator addfeed <feed name> <feed url>
+		This add a new feed to the aggregator feeds
+	8. gator follow <feed url> 
+		This command  makes the logged in user follow the feed
+	9. gator unfollow <feed url> 
+		This command  makes the logged in user unfollow the feed
+	10. gator following
+		This list all feeds the user is following
+	11. gator browse
+		This list all posts for the current user
+
+	12. gator help
+		list all commands and functionality
+`)
+	fmt.Println()
+	return nil
+}
