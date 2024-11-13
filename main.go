@@ -43,10 +43,12 @@ func main() {
 	commands.register("follow", middlewareLoggedIn(handlerFollow))
 	commands.register("following", middlewareLoggedIn(handlerFollowing))
 	commands.register("unfollow", middlewareLoggedIn(handlerUnFollow))
+	commands.register("browse", middlewareLoggedIn(handlerBrowse))
 
 	args := os.Args
 	if len(args) < 2 {
-		log.Panic("command and args expected")
+		log.Println("command and args expected")
+		return
 
 	}
 
@@ -57,7 +59,8 @@ func main() {
 
 	err = commands.run(&st, cmd)
 	if err != nil {
-		log.Panic(err)
+		log.Println(err)
+		return
 
 	}
 

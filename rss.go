@@ -3,7 +3,6 @@ package main
 import (
 	"context"
 	"encoding/xml"
-	"fmt"
 	"html"
 	"io"
 	"net/http"
@@ -41,6 +40,5 @@ func fetchFeed(ctx context.Context, feedURL string) (*RSSFeed, error) {
 		rss.Channel.Item[i].Title = html.UnescapeString(rss.Channel.Item[i].Title)
 		rss.Channel.Item[i].Description = html.UnescapeString(rss.Channel.Item[i].Description)
 	}
-	fmt.Println(rss)
 	return &rss, nil
 }

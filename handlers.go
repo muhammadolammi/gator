@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/muhammadolammi/gator/internal/database"
@@ -137,9 +138,8 @@ func handlerGetFeeds(s *state, cmd command, user database.User) error {
 		return err
 	}
 	for _, feed := range feeds {
-		fmt.Printf(feed.Name)
-		fmt.Printf(feed.Url)
-		fmt.Printf(feed.Name)
+		fmt.Printf("%s %s %s ", feed.Name, feed.Url, feed.Name)
+
 		user, err := s.db.GetUser(ctx, feed.UserID)
 		if err != nil {
 			return err
@@ -198,4 +198,33 @@ func handlerUnFollow(s *state, cmd command, user database.User) error {
 	})
 
 	return err
+}
+
+func handlerBrowse(s *state, cmd command, user database.User) error {
+	var limit int32
+	limit = 2
+
+	if len(cmd.args) == 1 {
+
+		l, err := strconv.Atoi(cmd.args[0])
+		if err != nil {
+			limit = 2
+		}
+		limit = int32(l)
+	}
+
+	posts, err := s.db.GetPostsForUser(ctx, database.GetPostsForUserParams{
+		ID:    user.ID,
+		Limit: limit,
+	})
+
+	if err != nil {
+		return err
+	}
+
+	for _, post := range posts {
+		fmt.Println(post)
+	}
+
+	return nil
 }
